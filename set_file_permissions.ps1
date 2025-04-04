@@ -14,10 +14,10 @@ if (Test-Path -Path $authorizedKeysPath) {
     $fullControlRule = New-Object System.Security.AccessControl.FileSystemAccessRule($currentUser, "FullControl", "Allow")
     $acl.AddAccessRule($fullControlRule)
 
-    # Deny write access to the Administrators group
+    # Optionally, you can add read access for the Administrators group without denying write access
     $administrators = "BUILTIN\Administrators"
-    $denyWriteRule = New-Object System.Security.AccessControl.FileSystemAccessRule($administrators, "Write", "Deny")
-    $acl.AddAccessRule($denyWriteRule)
+    $readRule = New-Object System.Security.AccessControl.FileSystemAccessRule($administrators, "Read", "Allow")
+    $acl.AddAccessRule($readRule)
 
     # Set the owner to the current user
     $acl.SetOwner([System.Security.Principal.NTAccount]$currentUser)
