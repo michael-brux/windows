@@ -19,10 +19,13 @@ if (Test-Path -Path $authorizedKeysPath) {
     $denyWriteRule = New-Object System.Security.AccessControl.FileSystemAccessRule($administrators, "Write", "Deny")
     $acl.AddAccessRule($denyWriteRule)
 
+    # Set the owner to the current user
+    $acl.SetOwner([System.Security.Principal.NTAccount]$currentUser)
+
     # Apply the modified ACL to the file
     Set-Acl -Path $authorizedKeysPath -AclObject $acl
 
-    Write-Output "Permissions for the authorized_keys file have been set successfully."
+    Write-Output "Permissions and ownership for the authorized_keys file have been set successfully."
 } else {
     Write-Output "The authorized_keys file does not exist at the specified path: $authorizedKeysPath"
 }
