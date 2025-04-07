@@ -1,0 +1,5 @@
+<job id="MinimalVBS">
+  <script language="VBScript">
+    WScript.Echo "VBScript engine is working in WSF!"
+  </script>
+</job>

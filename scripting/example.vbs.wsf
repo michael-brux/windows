@@ -1,0 +1,123 @@
+' Example Windows Script Host (WSH) Script for Windows 11 Pro (example.vbs)
+<job id="MyVBScriptJob">
+  <comment>This job demonstrates VBScript within a WSF file.</comment>
+
+  <script language="VBScript">
+
+
+' --- Basic Output and Variables ---
+WScript.Echo ""
+WScript.Echo "Hello from a WSH Script on Windows 11 Pro!"
+
+Dim userName
+userName = CreateObject("WScript.Network").UserName
+WScript.Echo "Current user: " & userName
+WScript.Echo ""
+
+' --- Date and Time ---
+WScript.Echo "--- Date and Time ---"
+WScript.Echo "Current date: " & Date()
+WScript.Echo "Current time: " & Time()
+WScript.Echo ""
+
+' --- System Information ---
+WScript.Echo "--- System Information ---"
+WScript.Echo "Operating System: " & GetObject("winmgmts:").ExecQuery("Select Caption from Win32_OperatingSystem")(0).Caption
+WScript.Echo "OS Version: " & GetObject("winmgmts:").ExecQuery("Select Version from Win32_OperatingSystem")(0).Version
+WScript.Echo ""
+
+' --- Directory and File Operations ---
+WScript.Echo "--- Directory and File Operations ---"
+Dim objFSO, strCurrentDir, strTestDir, strTestFile
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+strCurrentDir = objFSO.GetAbsolutePathName(".")
+WScript.Echo "Current directory: " & strCurrentDir
+
+strTestDir = strCurrentDir & "\TestDirectory"
+If Not objFSO.FolderExists(strTestDir) Then
+    objFSO.CreateFolder(strTestDir)
+    WScript.Echo "Created directory: TestDirectory"
+Else
+    WScript.Echo "Directory already exists: TestDirectory"
+End If
+
+strTestFile = strTestDir & "\TestFile.txt"
+Dim objFile
+Set objFile = objFSO.CreateTextFile(strTestFile, True)
+objFile.WriteLine "This is a test file."
+objFile.Close
+WScript.Echo "Created file: TestDirectory\TestFile.txt"
+
+WScript.Echo "File content:"
+Dim objReadFile
+Set objReadFile = objFSO.OpenTextFile(strTestFile, 1) ' 1 = ForReading
+WScript.Echo objReadFile.ReadAll
+objReadFile.Close
+WScript.Echo ""
+
+' --- Looping ---
+WScript.Echo "--- Looping ---"
+WScript.Echo "Numbers:"
+Dim i
+For i = 1 To 5
+    WScript.Echo i
+Next
+WScript.Echo ""
+
+' --- Conditional Logic ---
+WScript.Echo "--- Conditional Logic ---"
+Dim objWMIService, colOS, objOS
+Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
+Set colOS = objWMIService.ExecQuery("Select * from Win32_OperatingSystem")
+For Each objOS in colOS
+    If InStr(objOS.Caption, "Windows 11") > 0 Then
+        WScript.Echo "Running on Windows 11"
+    Else
+        WScript.Echo "Not running on Windows 11"
+    End If
+Next
+WScript.Echo ""
+
+' --- Running External Commands ---
+WScript.Echo "--- Running External Commands ---"
+WScript.Echo "IP Configuration:"
+Dim objShell, objExec
+Set objShell = CreateObject("WScript.Shell")
+Set objExec = objShell.Exec("ipconfig")
+WScript.Echo objExec.StdOut.ReadAll
+WScript.Echo ""
+
+' --- Environment Variables ---
+WScript.Echo "--- Environment Variables ---"
+WScript.Echo "Path: " & objShell.ExpandEnvironmentStrings("%PATH%")
+WScript.Echo "SystemRoot: " & objShell.ExpandEnvironmentStrings("%SystemRoot%")
+WScript.Echo ""
+
+' --- Error Handling ---
+WScript.Echo "--- Error Handling ---"
+On Error Resume Next
+Dim objNonExistentFile
+Set objNonExistentFile = objFSO.OpenTextFile("NonExistentFile.txt", 1)
+If Err.Number <> 0 Then
+    WScript.Echo "An error occurred: Could not find file."
+    Err.Clear
+End If
+On Error GoTo 0
+WScript.Echo ""
+
+' --- Cleanup ---
+WScript.Echo "--- Cleanup ---"
+If objFSO.FileExists(strTestFile) Then
+    objFSO.DeleteFile(strTestFile)
+End If
+If objFSO.FolderExists(strTestDir) Then
+    objFSO.DeleteFolder(strTestDir)
+End If
+WScript.Echo "Removed TestFile.txt and TestDirectory"
+WScript.Echo ""
+
+WScript.Echo "Script completed."
+
+</script>
+
+</job>

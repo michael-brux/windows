@@ -1,0 +1,117 @@
+' Example Windows Script Host (WSH) Script for Windows 11 Pro (example.vbs)
+ <job>
+  <script language="JScript">
+  // Example Windows Script Host (WSH) Script for Windows 11 Pro (example.js)
+
+  // --- Basic Output and Variables ---
+  WScript.Echo("");
+  WScript.Echo("Hello from a WSH Script on Windows 11 Pro!");
+
+  var userName = WScript.CreateObject("WScript.Network").UserName;
+  WScript.Echo("Current user: " + userName);
+  WScript.Echo("");
+
+  // --- Date and Time ---
+  WScript.Echo("--- Date and Time ---");
+  WScript.Echo("Current date: " + new Date().toLocaleDateString());
+  WScript.Echo("Current time: " + new Date().toLocaleTimeString());
+  WScript.Echo("");
+
+  // --- System Information ---
+  WScript.Echo("--- System Information ---");
+  var objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2");
+  var colOS = objWMIService.ExecQuery("Select Caption, Version from Win32_OperatingSystem");
+  var enumOS = new Enumerator(colOS);
+  for (; !enumOS.atEnd(); enumOS.moveNext()) {
+      var objOS = enumOS.item();
+      WScript.Echo("Operating System: " + objOS.Caption);
+      WScript.Echo("OS Version: " + objOS.Version);
+  }
+  WScript.Echo("");
+
+  // --- Directory and File Operations ---
+  WScript.Echo("--- Directory and File Operations ---");
+  var objFSO = WScript.CreateObject("Scripting.FileSystemObject");
+  var strCurrentDir = objFSO.GetAbsolutePathName(".");
+  WScript.Echo("Current directory: " + strCurrentDir);
+
+  var strTestDir = strCurrentDir + "\\TestDirectory";
+  if (!objFSO.FolderExists(strTestDir)) {
+      objFSO.CreateFolder(strTestDir);
+      WScript.Echo("Created directory: TestDirectory");
+  } else {
+      WScript.Echo("Directory already exists: TestDirectory");
+  }
+
+  var strTestFile = strTestDir + "\\TestFile.txt";
+  var objFile = objFSO.CreateTextFile(strTestFile, true);
+  objFile.WriteLine("This is a test file.");
+  objFile.Close();
+  WScript.Echo("Created file: TestDirectory\\TestFile.txt");
+
+  WScript.Echo("File content:");
+  var objReadFile = objFSO.OpenTextFile(strTestFile, 1); // 1 = ForReading
+  WScript.Echo(objReadFile.ReadAll());
+  objReadFile.Close();
+  WScript.Echo("");
+
+  // --- Looping ---
+  WScript.Echo("--- Looping ---");
+  WScript.Echo("Numbers:");
+  for (var i = 1; i <= 5; i++) {
+      WScript.Echo(i);
+  }
+  WScript.Echo("");
+
+  // --- Conditional Logic ---
+  WScript.Echo("--- Conditional Logic ---");
+  var objWMIService2 = GetObject("winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2");
+  var colOS2 = objWMIService2.ExecQuery("Select Caption from Win32_OperatingSystem");
+  var enumOS2 = new Enumerator(colOS2);
+  for (; !enumOS2.atEnd(); enumOS2.moveNext()) {
+      var objOS2 = enumOS2.item();
+      if (objOS2.Caption.indexOf("Windows 11") > -1) {
+          WScript.Echo("Running on Windows 11");
+      } else {
+          WScript.Echo("Not running on Windows 11");
+      }
+  }
+  WScript.Echo("");
+
+  // --- Running External Commands ---
+  WScript.Echo("--- Running External Commands ---");
+  WScript.Echo("IP Configuration:");
+  var objShell = WScript.CreateObject("WScript.Shell");
+  var objExec = objShell.Exec("ipconfig");
+  WScript.Echo(objExec.StdOut.ReadAll());
+  WScript.Echo("");
+
+  // --- Environment Variables ---
+  WScript.Echo("--- Environment Variables ---");
+  WScript.Echo("Path: " + objShell.ExpandEnvironmentStrings("%PATH%"));
+  WScript.Echo("SystemRoot: " + objShell.ExpandEnvironmentStrings("%SystemRoot%"));
+  WScript.Echo("");
+
+  // --- Error Handling ---
+  WScript.Echo("--- Error Handling ---");
+  try {
+      var objNonExistentFile = objFSO.OpenTextFile("NonExistentFile.txt", 1);
+  } catch (e) {
+      WScript.Echo("An error occurred: Could not find file.");
+  }
+  WScript.Echo("");
+
+  // --- Cleanup ---
+  WScript.Echo("--- Cleanup ---");
+  if (objFSO.FileExists(strTestFile)) {
+      objFSO.DeleteFile(strTestFile);
+  }
+  if (objFSO.FolderExists(strTestDir)) {
+      objFSO.DeleteFolder(strTestDir);
+  }
+  WScript.Echo("Removed TestFile.txt and TestDirectory");
+  WScript.Echo("");
+
+  WScript.Echo("Script completed.");
+  </script>
+ </job>
